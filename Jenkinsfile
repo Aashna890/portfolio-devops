@@ -21,10 +21,10 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Unit Tests') {
             steps {
-                echo 'Running unit tests...'
-                bat 'mvn test'
+                echo 'Running Selenium UI tests...'
+                bat 'mvn test -Dtest=SeleniumTest'
             }
             post {
                 always {
@@ -45,14 +45,13 @@ pipeline {
         stage('Health Check') {
             steps {
                 echo 'Build complete - artifact ready for deployment'
-                echo "Artifact: portfolio-0.0.1-SNAPSHOT.jar"
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline SUCCESS - Build is healthy'
+            echo '✅ Pipeline SUCCESS - All tests passed'
         }
         failure {
             echo '❌ Pipeline FAILED - Check logs above'

@@ -17,19 +17,22 @@
     <div class="card-header"><h5 class="mb-0">Add New Asset</h5></div>
     <div class="card-body">
       <form th:action="@{/assets/add}" method="post" th:object="${asset}">
+
         <div class="mb-3">
           <label class="form-label">Ticker Symbol</label>
           <input type="text" class="form-control" th:field="*{ticker}"
-                 placeholder="e.g. RELIANCE" required>
+                 id="ticker" placeholder="e.g. RELIANCE" required>
         </div>
+
         <div class="mb-3">
           <label class="form-label">Company / Fund Name</label>
           <input type="text" class="form-control" th:field="*{name}"
-                 placeholder="e.g. Reliance Industries" required>
+                 id="name" placeholder="e.g. Reliance Industries" required>
         </div>
+
         <div class="mb-3">
           <label class="form-label">Asset Type</label>
-          <select class="form-select" th:field="*{type}" required>
+          <select class="form-select" th:field="*{type}" id="type" required>
             <option value="">-- Select --</option>
             <option value="STOCK">Stock</option>
             <option value="MUTUAL_FUND">Mutual Fund</option>
@@ -37,24 +40,29 @@
             <option value="ETF">ETF</option>
           </select>
         </div>
+
         <div class="mb-3">
           <label class="form-label">Quantity</label>
           <input type="number" step="0.01" class="form-control"
-                 th:field="*{quantity}" placeholder="e.g. 10" required>
+                 th:field="*{quantity}" id="quantity" placeholder="e.g. 10" required>
         </div>
+
         <div class="mb-3">
           <label class="form-label">Buy Price (₹)</label>
           <input type="number" step="0.01" class="form-control"
-                 th:field="*{buyPrice}" placeholder="e.g. 2450.00" required>
+                 th:field="*{buyPrice}" id="buyPrice" placeholder="e.g. 2450.00" required>
         </div>
+
         <div class="mb-3">
           <label class="form-label">Buy Date</label>
           <input type="date" class="form-control" th:field="*{buyDate}">
         </div>
+
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-success">Save Asset</button>
           <a th:href="@{/dashboard}" class="btn btn-secondary">Cancel</a>
         </div>
+
       </form>
     </div>
   </div>
