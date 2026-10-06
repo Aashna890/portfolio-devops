@@ -1,53 +1,152 @@
+/* ── Base ── */
 body {
   background-color: #0d1117;
   color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.navbar { border-bottom: 1px solid #30363d; }
+/* ── Navbar ── */
+.navbar {
+  border-bottom: 1px solid #30363d;
+  background-color: #161b22 !important;
+}
+.navbar-brand {
+  color: #e6edf3 !important;
+  font-size: 1.1rem;
+}
+.nav-link {
+  color: #e6edf3 !important;
+}
+.nav-link.active {
+  color: #58a6ff !important;
+}
 
+/* ── KPI Cards ── */
 .kpi-card {
   background: #161b22;
   border: 1px solid #30363d;
   border-radius: 8px;
 }
-
 .kpi-label {
-  font-size: 12px;
-  color: #7d8590;
+  font-size: 11px;
+  color: #8b949e;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: 6px;
-}
-
-.kpi-value {
-  font-size: 24px;
   font-weight: 600;
 }
+.kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #e6edf3;
+}
 
+/* ── Cards ── */
 .card {
   background: #161b22;
   border: 1px solid #30363d;
+  color: #e6edf3;
 }
-
 .card-header {
   background: #1c2128;
   border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.card-footer {
+  background: #1c2128;
+  border-top: 1px solid #30363d;
 }
 
+/* ── Table ── */
 .table-dark {
   --bs-table-bg: #161b22;
   --bs-table-hover-bg: #1c2128;
+  --bs-table-color: #e6edf3;
+  --bs-table-border-color: #30363d;
+}
+.table thead th {
+  color: #8b949e;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #30363d;
+  font-weight: 600;
+}
+.table tbody td {
+  color: #e6edf3;
+  vertical-align: middle;
+  border-color: #21262d;
 }
 
-.form-control, .form-select {
-  background: #0d1117;
+/* ── Forms ── */
+.form-control,
+.form-select {
+  background-color: #0d1117;
   border: 1px solid #30363d;
   color: #e6edf3;
 }
-
-.form-control:focus, .form-select:focus {
-  background: #0d1117;
+.form-control::placeholder {
+  color: #484f58;
+}
+.form-control:focus,
+.form-select:focus {
+  background-color: #0d1117;
   border-color: #58a6ff;
   color: #e6edf3;
-  box-shadow: 0 0 0 3px rgba(88,166,255,0.15);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+.form-select option {
+  background-color: #161b22;
+  color: #e6edf3;
+}
+.form-label {
+  color: #cdd9e5;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.form-text {
+  color: #8b949e !important;
+}
+
+/* ── List group ── */
+.list-group-item {
+  background-color: #161b22;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+
+/* ── Badges ── */
+.badge.bg-secondary {
+  background-color: #30363d !important;
+  color: #e6edf3;
+}
+
+/* ── Buttons ── */
+.btn-outline-secondary {
+  color: #8b949e;
+  border-color: #30363d;
+}
+.btn-outline-secondary:hover {
+  background-color: #21262d;
+  color: #e6edf3;
+  border-color: #8b949e;
+}
+
+/* ── Text helpers ── */
+.text-muted {
+  color: #8b949e !important;
+}
+a {
+  color: #58a6ff;
+}
+a:hover {
+  color: #79c0ff;
+}
+
+/* ── Chart card empty state ── */
+.card-body p.text-muted {
+  color: #8b949e !important;
+  padding-top: 60px;
 }
