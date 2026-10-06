@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Alerts</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark px-4">
+  <span class="navbar-brand fw-bold"><i class="bi bi-bell"></i> Alerts</span>
+  <a th:href="@{/dashboard}" class="btn btn-outline-light btn-sm">← Dashboard</a>
+</nav>
+
+<div class="container py-4">
+  <div class="row g-4">
+
+    <!-- ADD ALERT FORM -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">Set New Alert</div>
+        <div class="card-body">
+          <form th:action="@{/alerts/add}" method="post">
+            <div class="mb-3">
+              <label class="form-label">Asset</label>
+              <select class="form-select" name="assetId" required>
+                <option value="">-- Select Asset --</option>
+                <option th:each="asset : ${assets}"
+                        th:value="${asset.id}"
+                        th:text="${asset.ticker} + ' — ' + ${asset.name}">
+                </option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Alert Type</label>
+              <select class="form-select" name="alertType" required>
+                <option value="LOSS_PERCENT">Loss % exceeds threshold</option>
+                <option value="TARGET_PRICE">Target price reached</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Threshold Value</label>
+              <input type="number" step="0.01" class="form-control"
+                     name="threshold" placeholder="e.g. 5 for 5% loss" required>
+              <div class="form-text text-muted">
+                For loss%: enter 5 → alert if loss exceeds 5%<br>
+                For target: enter price → alert if price hits it
+              </div>
+            </div>
+            <button type="submit" class="btn btn-warning w-100">Set Alert</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+
+      <!-- TRIGGERED ALERTS -->
+      <div class="card mb-4" th:if="${!triggered.isEmpty()}">
+        <div class="card-header text-danger">
+          <i class="bi bi-exclamation-triangle"></i> Triggered Alerts
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-dark mb-0">
+            <thead>
+              <tr><th>Asset</th><th>Type</th><th>Threshold</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="alert : ${triggered}">
+                <td th:text="${alert.asset.ticker}"></td>
+                <td th:text="${alert.alertType}"></td>
+                <td th:text="${alert.threshold}"></td>
+                <td><span class="badge bg-danger">TRIGGERED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALL ALERTS -->
+      <div class="card">
+        <div class="card-header">All Configured Alerts</div>
+        <div class="card-body p-0">
+          <table class="table table-dark table-hover mb-0">
+            <thead>
+              <tr><th>Asset</th><th>Type</th><th>Threshold</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="alert : ${alerts}">
+                <td>
+                  <span class="badge bg-secondary" th:text="${alert.asset.ticker}"></span>
+                </td>
+                <td th:text="${alert.alertType}"></td>
+                <td th:text="${alert.threshold}"></td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${alert.triggered} ? 'bg-danger' : 'bg-success'"
+                        th:text="${alert.triggered} ? 'TRIGGERED' : 'ACTIVE'">
+                  </span>
+                </td>
+                <td>
+                  <a th:href="@{/alerts/delete/{id}(id=${alert.id})}"
+                     onclick="return confirm('Delete alert?')"
+                     class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+              </tr>
+              <tr th:if="${alerts.isEmpty()}">
+                <td colspan="5" class="text-center text-muted py-3">No alerts configured yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

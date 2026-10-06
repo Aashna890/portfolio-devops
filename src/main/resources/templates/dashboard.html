@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark px-4">
+  <span class="navbar-brand fw-bold"><i class="bi bi-graph-up-arrow"></i> Portfolio Dashboard</span>
+  <div class="d-flex gap-3">
+    <a th:href="@{/dashboard}" class="nav-link text-white active">Dashboard</a>
+    <a th:href="@{/alerts}" class="nav-link text-warning">
+      <i class="bi bi-bell"></i> Alerts
+      <span th:if="${triggeredAlerts > 0}"
+            class="badge bg-danger" th:text="${triggeredAlerts}"></span>
+    </a>
+    <a th:href="@{/assets/add}" class="btn btn-success btn-sm">+ Add Asset</a>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+
+  <!-- KPI CARDS -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Total Invested</div>
+          <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(summary['totalInvested'], 1, 2)}"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Current Value</div>
+          <div class="kpi-value text-info">₹<span th:text="${#numbers.formatDecimal(summary['currentValue'], 1, 2)}"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Profit / Loss</div>
+          <div class="kpi-value"
+               th:classappend="${summary['profitLoss'] >= 0} ? 'text-success' : 'text-danger'">
+            ₹<span th:text="${#numbers.formatDecimal(summary['profitLoss'], 1, 2)}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Overall Return</div>
+          <div class="kpi-value"
+               th:classappend="${summary['plPercent'] >= 0} ? 'text-success' : 'text-danger'">
+            <span th:text="${#numbers.formatDecimal(summary['plPercent'], 1, 2)}"></span>%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <form th:action="@{/dashboard}" method="get" class="d-flex gap-2">
+        <input type="text" name="search" class="form-control"
+               placeholder="Search by ticker or name..."
+               th:value="${search}">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a th:href="@{/dashboard}" class="btn btn-outline-secondary">Clear</a>
+      </form>
+    </div>
+    <div class="col-md-6 text-end">
+      <span class="text-muted" th:text="${assets.size()} + ' assets'"></span>
+    </div>
+  </div>
+
+  <!-- ASSETS TABLE -->
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="table table-dark table-hover mb-0" id="assetTable">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Buy Price</th>
+            <th>Current Price</th>
+            <th>Invested</th>
+            <th>Current Value</th>
+            <th>P&amp;L</th>
+            <th>P&amp;L %</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="asset : ${assets}" th:id="'row-' + ${asset.id}">
+            <td><span class="badge bg-secondary" th:text="${asset.ticker}"></span></td>
+            <td th:text="${asset.name}"></td>
+            <td th:text="${asset.type}"></td>
+            <td th:text="${asset.quantity}"></td>
+            <td>₹<span th:text="${#numbers.formatDecimal(asset.buyPrice, 1, 2)}"></span></td>
+            <td>₹<span th:text="${#numbers.formatDecimal(asset.currentPrice, 1, 2)}"></span></td>
+            <td>₹<span th:text="${#numbers.formatDecimal(asset.investedAmount, 1, 2)}"></span></td>
+            <td>₹<span th:text="${#numbers.formatDecimal(asset.currentValue, 1, 2)}"></span></td>
+            <td th:classappend="${asset.profitLoss >= 0} ? 'text-success' : 'text-danger'">
+              ₹<span th:text="${#numbers.formatDecimal(asset.profitLoss, 1, 2)}"></span>
+            </td>
+            <td th:classappend="${asset.profitLossPercent >= 0} ? 'text-success' : 'text-danger'">
+              <span th:text="${#numbers.formatDecimal(asset.profitLossPercent, 1, 2)}"></span>%
+            </td>
+            <td>
+              <a th:href="@{/assets/{id}(id=${asset.id})}" class="btn btn-sm btn-outline-info">View</a>
+              <a th:href="@{/assets/edit/{id}(id=${asset.id})}" class="btn btn-sm btn-outline-warning">Edit</a>
+              <a th:href="@{/assets/delete/{id}(id=${asset.id})}"
+                 onclick="return confirm('Delete this asset?')"
+                 class="btn btn-sm btn-outline-danger">Del</a>
+            </td>
+          </tr>
+          <tr th:if="${assets.isEmpty()}">
+            <td colspan="11" class="text-center text-muted py-4">
+              No assets found. <a th:href="@{/assets/add}">Add your first asset →</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

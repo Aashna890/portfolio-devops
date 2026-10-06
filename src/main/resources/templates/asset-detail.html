@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Asset Detail</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark px-4">
+  <span class="navbar-brand fw-bold">Portfolio Dashboard</span>
+  <a th:href="@{/dashboard}" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+</nav>
+
+<div class="container py-4">
+
+  <!-- ASSET HEADER -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">
+            <span class="badge bg-secondary me-2" th:text="${asset.ticker}"></span>
+            <span th:text="${asset.name}"></span>
+          </h2>
+          <span class="badge bg-primary" th:text="${asset.type}"></span>
+        </div>
+        <div class="text-end">
+          <div class="kpi-label">Current Price</div>
+          <div class="kpi-value text-info">
+            ₹<span th:text="${#numbers.formatDecimal(asset.currentPrice, 1, 2)}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Quantity</div>
+          <div class="kpi-value" th:text="${asset.quantity}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Buy Price</div>
+          <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(asset.buyPrice, 1, 2)}"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Invested Amount</div>
+          <div class="kpi-value">₹<span th:text="${#numbers.formatDecimal(asset.investedAmount, 1, 2)}"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card kpi-card">
+        <div class="card-body">
+          <div class="kpi-label">Profit / Loss</div>
+          <div class="kpi-value"
+               th:classappend="${asset.profitLoss >= 0} ? 'text-success' : 'text-danger'">
+            ₹<span th:text="${#numbers.formatDecimal(asset.profitLoss, 1, 2)}"></span>
+            (<span th:text="${#numbers.formatDecimal(asset.profitLossPercent, 1, 2)}"></span>%)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- PRICE CHART -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">Price Performance</div>
+        <div class="card-body">
+          <canvas id="priceChart" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTS FOR THIS ASSET -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">Alerts on this Asset</div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" th:if="${!alerts.isEmpty()}">
+            <li class="list-group-item bg-transparent text-light"
+                th:each="alert : ${alerts}">
+              <span class="badge"
+                    th:classappend="${alert.triggered} ? 'bg-danger' : 'bg-success'"
+                    th:text="${alert.triggered} ? 'TRIGGERED' : 'ACTIVE'"></span>
+              <span th:text="${alert.alertType}"></span> @
+              <strong th:text="${alert.threshold}"></strong>
+            </li>
+          </ul>
+          <p th:if="${alerts.isEmpty()}" class="text-muted p-3 mb-0">No alerts set.</p>
+        </div>
+        <div class="card-footer">
+          <a th:href="@{/alerts}" class="btn btn-sm btn-outline-warning w-100">Manage Alerts</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+  const buyPrice = [[${asset.buyPrice}]];
+  const currentPrice = [[${asset.currentPrice}]];
+
+  // Generate mock historical prices between buy and current
+  const points = 10;
+  const labels = [];
+  const data = [];
+  for (let i = 0; i < points; i++) {
+    labels.push(`Day ${i + 1}`);
+    const progress = i / (points - 1);
+    const noise = (Math.random() - 0.5) * (currentPrice - buyPrice) * 0.3;
+    data.push(+(buyPrice + (currentPrice - buyPrice) * progress + noise).toFixed(2));
+  }
+  data[0] = buyPrice;
+  data[points - 1] = currentPrice;
+
+  const isProfit = currentPrice >= buyPrice;
+  const color = isProfit ? '#3fb950' : '#f85149';
+
+  new Chart(document.getElementById('priceChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: [[${asset.ticker}]],
+        data,
+        borderColor: color,
+        backgroundColor: color + '22',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#e6edf3' } } },
+      scales: {
+        x: { ticks: { color: '#7d8590' }, grid: { color: '#30363d' } },
+        y: { ticks: { color: '#7d8590' }, grid: { color: '#30363d' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
