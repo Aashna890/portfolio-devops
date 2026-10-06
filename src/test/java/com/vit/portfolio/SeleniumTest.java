@@ -26,7 +26,7 @@ public class SeleniumTest {
 
     @BeforeAll
     static void setup() {
-        WebDriverManager.chromedriver().setup();
+        WebDriverManager.chromedriver().browserVersion("154").setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--no-sandbox");
