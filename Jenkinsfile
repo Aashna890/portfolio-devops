@@ -51,13 +51,14 @@ pipeline {
 
         stage('Docker Deploy') {
             steps {
-                echo 'Stopping old container if running...'
-                bat "docker stop ${CONTAINER_NAME} & echo stopped"
-                bat "docker rm ${CONTAINER_NAME} & echo removed"
-
+                echo 'Cleaning up old container...'
+                bat """
+                    docker stop ${CONTAINER_NAME} 2>nul
+                    docker rm ${CONTAINER_NAME} 2>nul
+                    exit 0
+                """
                 echo "Starting new container: ${CONTAINER_NAME}"
                 bat "docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
-
                 echo 'Waiting for app to start...'
                 bat 'timeout /t 15 /nobreak'
             }
