@@ -1,0 +1,39 @@
+---
+- name: Deploy Portfolio App
+  hosts: local
+  become: false
+
+  vars:
+    image_name: portfolio-app
+    container_name: portfolio-container
+    app_port: 8085
+
+  tasks:
+
+    - name: Stop existing container if running
+      command: docker stop {{ container_name }}
+      ignore_errors: yes
+
+    - name: Remove existing container if exists
+      command: docker rm {{ container_name }}
+      ignore_errors: yes
+
+    - name: Start new container
+      command: >
+        docker run -d
+        -p {{ app_port }}:{{ app_port }}
+        --name {{ container_name }}
+        --restart unless-stopped
+        {{ image_name }}:latest
+
+    - name: Wait for app to start
+      pause:
+        seconds: 10
+
+    - name: Verify container is running
+      command: docker ps --filter name={{ container_name }}
+      register: container_status
+
+    - name: Show container status
+      debug:
+        msg: "{{ container_status.stdout }}"
