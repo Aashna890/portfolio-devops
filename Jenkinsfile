@@ -52,8 +52,8 @@ pipeline {
         stage('Docker Deploy') {
             steps {
                 echo 'Stopping old container if running...'
-                bat "docker stop ${CONTAINER_NAME} || echo 'No container to stop'"
-                bat "docker rm ${CONTAINER_NAME}   || echo 'No container to remove'"
+                bat "docker stop ${CONTAINER_NAME} & echo stopped"
+                bat "docker rm ${CONTAINER_NAME} & echo removed"
 
                 echo "Starting new container: ${CONTAINER_NAME}"
                 bat "docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
@@ -66,7 +66,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 echo 'Checking app health...'
-                bat "curl -f http://localhost:${APP_PORT}/actuator/health || echo 'Health check done'"
+                bat "curl -f http://localhost:${APP_PORT}/actuator/health"
                 bat "docker ps --filter name=${CONTAINER_NAME}"
             }
         }
@@ -78,7 +78,6 @@ pipeline {
         }
         failure {
             echo '❌ Pipeline FAILED - Check logs above'
-            bat "docker stop ${CONTAINER_NAME} || echo 'Cleanup attempted'"
         }
     }
 }
