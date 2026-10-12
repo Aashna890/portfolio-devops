@@ -53,14 +53,14 @@ pipeline {
             steps {
                 echo 'Cleaning up old container...'
                 bat """
-                    docker stop ${CONTAINER_NAME} 2>nul
-                    docker rm ${CONTAINER_NAME} 2>nul
-                    exit 0
-                """
+            docker stop ${CONTAINER_NAME} 2>nul
+            docker rm ${CONTAINER_NAME} 2>nul
+            exit 0
+        """
                 echo "Starting new container: ${CONTAINER_NAME}"
                 bat "docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
                 echo 'Waiting for app to start...'
-                bat 'timeout /t 15 /nobreak'
+                bat 'ping -n 16 127.0.0.1 > nul'
             }
         }
 
